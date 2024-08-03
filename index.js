@@ -1149,7 +1149,6 @@ module.exports = {
   memoizedGetPurse,
   memoizedFormatNumber,
   optimizedRelistCheck,
-  runCPUIntensiveTask,
   createWebhookEmbed,
   getCachedData,
   queueApiCall,
