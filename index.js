@@ -42,6 +42,11 @@ const {
   ownAuctions
 } = config;
 
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
 let webhook, bot, cdClaim = 0, fullInv = false, relistClaim = false, uuidFound = false, lastLeftBuying;
 let privacySettings, lastGui = 0, ranit = false, totalslots = 17, currentlisted = 0, closedGui = false, bedFailed = false;
 const targetQueue = new Set(), idQueue = new Set(), finderQueue = new Set(), purchasedIds = new Set(), purchasedTargets = new Map();
