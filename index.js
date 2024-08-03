@@ -21,26 +21,41 @@ const fastJsonParse = require('fast-json-parse');
 const { Worker } = require('worker_threads');
 const { LRUCache } = require('lru-cache');
 
-// Initialize constants and variables
-let {
-  username: ign,
-  bedSpam,
-  discordID: discordid,
-  TOS,
-  webhook: webhookUrl,
-  usInstance,
-  clickDelay,
-  delay,
-  useBafSocket: usingBaf,
-  session,
-  discordBotToken: discordbot,
-  doNotListFinders: badFinders = ['USER'],
-  waittime,
-  uuid,
-  percentOfTarget,
-  relist,
-  ownAuctions
-} = config;
+let ign, bedSpam, discordid, TOS, webhookUrl, usInstance, clickDelay, delay, usingBaf, session, 
+    discordbot, badFinders, waittime, uuid, percentOfTarget, relist, ownAuctions;
+
+// Initialize global variables from config
+function initializeGlobals() {
+  ({
+    username: ign,
+    bedSpam,
+    discordID: discordid,
+    TOS,
+    webhook: webhookUrl,
+    usInstance,
+    clickDelay,
+    delay,
+    useBafSocket: usingBaf,
+    session,
+    discordBotToken: discordbot,
+    doNotListFinders: badFinders = ['USER'],
+    waittime,
+    uuid,
+    percentOfTarget,
+    relist,
+    ownAuctions
+  } = config);
+}
+
+let bot;
+let lastAction = Date.now();
+let lastLeftBuying;
+let currentOpen;
+let closedGui = false;
+let bedFailed = false;
+let firstGui;
+
+const badFindersSet = new Set(badFinders);
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -454,7 +469,7 @@ if (!session) {
 
 // start bot
 async function start() {
-  let lastAction = Date.now();
+  initializeGlobals();
   const stuckFailsafe = new Set();
   
   bot = mineflayer.createBot({
