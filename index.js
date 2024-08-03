@@ -47,7 +47,7 @@ function initializeGlobals() {
   } = config);
 }
 
-let bot;
+
 let lastAction = Date.now();
 let lastLeftBuying;
 let currentOpen;
