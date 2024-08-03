@@ -144,5 +144,16 @@ function nicerFinders(finder) {
     return finder;
 }
 
+function memoize(fn) {
+  const cache = new Map();
+  return (...args) => {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) return cache.get(key);
+    const result = fn(...args);
+    cache.set(key, result);
+    return result;
+  };
+}
+
 const sleep = ms => new Promise((resolve) => setTimeout(resolve, ms))
-module.exports = { noColorCodes, onlyNumbers, normalizeDate, IHATETAXES, formatNumber, sleep, getWindowName, saveData, getPurse, relistCheck, addCommasToNumber, nicerFinders }
+module.exports = { noColorCodes, onlyNumbers, normalizeDate, IHATETAXES, formatNumber, sleep, getWindowName, saveData, getPurse, relistCheck, addCommasToNumber, nicerFinders, memoize }
