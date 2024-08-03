@@ -869,98 +869,100 @@ async function start() {
   });
 
   ws.on('flip', async msg => {
-    let bed = '[NUGGET]';
-    const data = fastJsonParse(msg.data).value;
-    let itemName, auctionID;
-    const currentTime = Date.now();
-    
-    if (usingBaf) {
-      if (!bot.state && currentTime - lastAction > delay) {
-        lastLeftBuying = currentTime;
-        bot.state = 'buying';
-        auctionID = data.id;
-        packets.sendMessage(`/viewauction ${auctionID}`);
-        let target = data.target;
-        let finder = data.finder;
-        itemName = data.itemName.replace(/[!-us.]|(?:\d{1,2}x)/g, "");
-        lastAction = currentTime;
-        logmc(`§6[§bTPM§6] §8Opening ${itemName}`);
-        closedGui = false;
-        bedFailed = false;
-        currentOpen = data.id;
-        lastOpenedTargets.clear();
-        lastOpenedTargets.add(target);
-        lastOpenedAhids.clear();
-        lastOpenedAhids.add(auctionID);
-        lastOpenedFinders.clear();
-        lastOpenedFinders.add(finder);
-        relistObject.set(itemName, {
-          id: auctionID,
-          target: target,
-          finder: data.finder
-        });
-      } else {
-        auctionID = data.id;
-        itemName = data.itemName.replace(/[!-us.]|(?:\d{1,2}x)/g, "");
-        logmc(`§6[§bTPM§6] §aAdding ${itemName}§3 to the pipeline because state is ${bot.state}!`);
-        stateManager.add(itemName, 69, 'buying');
-      }
-      idQueue.add(data.id);
-      targetQueue.add(data.target);
-      finderQueue.add(data.finder);
-      const ending = new Date(normalizeDate(data.purchaseAt)).getTime();
-      webhookPricing.set(itemName, {
-        target: data.target,
-        price: data.startingBid,
-        auctionId: auctionID,
-        bed: bed,
-        finder: data.finder,
+  let bed = '[NUGGET]';
+  const data = fastJsonParse(msg.data).value;
+  let itemName, auctionID;
+  const currentTime = Date.now();
+  
+  if (usingBaf) {
+    if (!bot.state && currentTime - lastAction > delay) {
+      lastLeftBuying = currentTime;
+      bot.state = 'buying';
+      auctionID = data.id;
+      packets.sendMessage(`/viewauction ${auctionID}`);
+      let target = data.target;
+      let finder = data.finder;
+      itemName = data.itemName;  // Store the full item name
+      const cleanItemName = itemName.replace(/[!-us.]|(?:\d{1,2}x)/g, "").trim();  // Clean name for object keys
+      lastAction = currentTime;
+      logmc(`§6[§bTPM§6] §8Opening ${itemName}`);
+      closedGui = false;
+      bedFailed = false;
+      currentOpen = data.id;
+      lastOpenedTargets.clear();
+      lastOpenedTargets.add(target);
+      lastOpenedAhids.clear();
+      lastOpenedAhids.add(auctionID);
+      lastOpenedFinders.clear();
+      lastOpenedFinders.add(finder);
+      relistObject.set(cleanItemName, {
+        id: auctionID,
+        target: target,
+        finder: data.finder
       });
-      if (currentTime < ending) {
-        bed = '[BED]';
-        webhookPricing.get(itemName).bed = bed;
-        setTimeout(async () => {
-          for (let i = 0; i < 4; i++) {
-            if (getWindowName(bot.currentWindow)?.includes('BIN Auction View')) {
-              bot.clickWindow(31, 0, 0);
-              await sleep(3);
-            }
-          }
-        }, ending - currentTime - waittime);
-        setTimeout(() => {
-          if (getWindowName(bot.currentWindow)?.includes('BIN Auction View') && currentOpen === auctionID) {
-            bot.closeWindow(bot.currentWindow);
-            bot.state = null;
-            logmc(`§6[§bTPM§6] §cBed timing failed and we had to abort the auction :( Please lower your waittime if this continues or turn on bedspam`);
-          }
-        }, 5000);
-      }
     } else {
-      // Similar logic for non-BAF case
-      // ... (implement the non-BAF logic here)
+      auctionID = data.id;
+      itemName = data.itemName;  // Store the full item name
+      const cleanItemName = itemName.replace(/[!-us.]|(?:\d{1,2}x)/g, "").trim();  // Clean name for object keys
+      logmc(`§6[§bTPM§6] §aAdding ${itemName}§3 to the pipeline because state is ${bot.state}!`);
+      stateManager.add(itemName, 69, 'buying');  // Use the full item name here
     }
-    
-    // Use Set for efficient tracking of stuck states
-    if (!stuckFailsafe.has(bot.state)) {
-      stuckFailsafe.add(bot.state);
-      setImmediate(() => {
-        const checkStuck = () => {
-          if (bot.state && Date.now() - lastAction > 30000) {
-            logmc(`§6[§bTPM§6] §cGot stuck :( `);
-            if (getWindowName(bot.currentWindow)) bot.closeWindow(bot.currentWindow);
-            bot.state = null;
-            lastAction = Date.now();
+    idQueue.add(data.id);
+    targetQueue.add(data.target);
+    finderQueue.add(data.finder);
+    const ending = new Date(normalizeDate(data.purchaseAt)).getTime();
+    const cleanItemName = itemName.replace(/[!-us.]|(?:\d{1,2}x)/g, "").trim();  // Clean name for object keys
+    webhookPricing.set(cleanItemName, {
+      target: data.target,
+      price: data.startingBid,
+      auctionId: auctionID,
+      bed: bed,
+      finder: data.finder,
+    });
+    if (currentTime < ending) {
+      bed = '[BED]';
+      webhookPricing.get(cleanItemName).bed = bed;
+      setTimeout(async () => {
+        for (let i = 0; i < 4; i++) {
+          if (getWindowName(bot.currentWindow)?.includes('BIN Auction View')) {
+            bot.clickWindow(31, 0, 0);
+            await sleep(3);
           }
-          if (stuckFailsafe.has(bot.state)) {
-            setImmediate(checkStuck);
-          }
-        };
-        checkStuck();
-      });
+        }
+      }, ending - currentTime - waittime);
+      setTimeout(() => {
+        if (getWindowName(bot.currentWindow)?.includes('BIN Auction View') && currentOpen === auctionID) {
+          bot.closeWindow(bot.currentWindow);
+          bot.state = null;
+          logmc(`§6[§bTPM§6] §cBed timing failed and we had to abort the auction :( Please lower your waittime if this continues or turn on bedspam`);
+        }
+      }, 5000);
     }
-    debug(`Found flip ${itemName} uuid ${auctionID}`)
-  });
-
+  } else {
+    // Similar changes for the non-BAF case
+    // ... (implement the non-BAF logic here with similar modifications)
+  }
+  
+  // Use Set for efficient tracking of stuck states
+  if (!stuckFailsafe.has(bot.state)) {
+    stuckFailsafe.add(bot.state);
+    setImmediate(() => {
+      const checkStuck = () => {
+        if (bot.state && Date.now() - lastAction > 30000) {
+          logmc(`§6[§bTPM§6] §cGot stuck :( `);
+          if (getWindowName(bot.currentWindow)) bot.closeWindow(bot.currentWindow);
+          bot.state = null;
+          lastAction = Date.now();
+        }
+        if (stuckFailsafe.has(bot.state)) {
+          setImmediate(checkStuck);
+        }
+      };
+      checkStuck();
+    });
+  }
+  debug(`Found flip ${itemName} uuid ${auctionID}`)
+});
   setInterval(() => {
     // BED SPAM
     if (!bedSpam && !bedFailed) return;
