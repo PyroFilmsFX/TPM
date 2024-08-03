@@ -19,7 +19,7 @@ const { config, updateConfig } = require('./config.js');
 const nbt = require('prismarine-nbt');
 const fastJsonParse = require('fast-json-parse');
 const { Worker } = require('worker_threads');
-const LRU = require('lru-cache');
+const { LRUCache } = require('lru-cache');
 
 // Initialize constants and variables
 const {
@@ -59,7 +59,7 @@ const memoizedGetPurse = utils.memoize(getPurse);
 const memoizedFormatNumber = utils.memoize(formatNumber);
 
 // LRU Cache for frequently accessed data
-const dataCache = new LRU({
+const dataCache = new LRUCache({
   max: 1000,
   maxAge: 1000 * 60 * 5 // 5 minutes
 });
