@@ -22,7 +22,7 @@ const { Worker } = require('worker_threads');
 const { LRUCache } = require('lru-cache');
 
 // Initialize constants and variables
-const {
+let {
   username: ign,
   bedSpam,
   discordID: discordid,
