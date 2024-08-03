@@ -49,10 +49,7 @@ function initializeGlobals() {
 
 
 let lastAction = Date.now();
-let lastLeftBuying;
 let currentOpen;
-let closedGui = false;
-let bedFailed = false;
 let firstGui;
 
 const badFindersSet = new Set(badFinders);
