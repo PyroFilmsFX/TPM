@@ -454,6 +454,7 @@ if (!session) {
 
 // start bot
 async function start() {
+  let lastAction = Date.now();
   const stuckFailsafe = new Set();
   
   bot = mineflayer.createBot({
