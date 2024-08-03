@@ -64,8 +64,6 @@ const dataCache = new LRU({
   maxAge: 1000 * 60 * 5 // 5 minutes
 });
 
-// Worker for CPU-intensive tasks
-const cpuWorker = new Worker('./cpuWorker.js');
 
 // Optimized event handlers
 const messageHandlers = new Map([
@@ -1020,8 +1018,6 @@ function memoize(fn) {
   };
 }
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
 function optimizedRelistCheck(currentlisted, totalslots, botstate) {
   if ((botstate === null || botstate === 'listing') && (currentlisted !== totalslots)) {
     return true;
@@ -1037,15 +1033,6 @@ function optimizedRelistCheck(currentlisted, totalslots, botstate) {
   }
 }
 
-// Worker thread for CPU-intensive tasks
-cpuWorker.on('message', (result) => {
-  // Handle the result from the worker
-  console.log('Received result from worker:', result);
-});
-
-function runCPUIntensiveTask(data) {
-  cpuWorker.postMessage(data);
-}
 
 // Implement object pooling for frequently created objects
 const objectPool = {
