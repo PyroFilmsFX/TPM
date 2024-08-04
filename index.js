@@ -75,6 +75,9 @@ function initConfig() {
     updateConfig(config);
     sidListener(session);
   }
+
+  startWS(session);
+  lastAction = Date.now();
 }
 
 const getReadyMemoized = memoize(async function getReady() {
@@ -185,8 +188,6 @@ const getReadyMemoized = memoize(async function getReady() {
       }
     });
   });
-  startWS(session);
-  lastAction = Date.now();
 
 });
 
