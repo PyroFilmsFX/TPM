@@ -185,6 +185,9 @@ const getReadyMemoized = memoize(async function getReady() {
       }
     });
   });
+  startWS(session);
+  lastAction = Date.now();
+
 });
 
 async function relistHandler(purchasedAhids, purchasedPrices) {
