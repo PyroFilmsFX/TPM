@@ -456,6 +456,24 @@ async function start() {
     old = bot.state;
     if (current && bot.state === null && Date.now() - lastAction > delay) {
       const command = current.command;
+
+      if (typeof command === 'string' && command !== 'claim' && command !== 'sold') {
+        bot.state = 'buying';
+        logmc(`§6[§bTPM§6] §8Opening ${command}`);
+        const ahhhhh = webhookPricingMap.get(command);
+        if (ahhhhh) {
+          var ahid = ahhhhh.id;
+          bedFailed = true;
+          currentOpen = ahid;
+          bot.chat(`/viewauction ${ahid}`);
+          lastAction = Date.now();
+          debug(`Attempting to purchase ${command} with ID ${ahid}`);
+        } else {
+          error(`Ahhh didn't find ${command} in webhookPricingMap`);
+          bot.state = null;
+        }
+      }
+
       if (command === 'claim') {
         bot.state = current.state;
         bot.state = 'claiming';
@@ -500,7 +518,7 @@ async function start() {
       lastAction = Date.now();
       debug(`Turning state into ${bot.state} and running ${current.command}`);
     }
-  }, 1);
+  }, 100);
 
   bot.once('spawn', async () => {
     await bot.waitForChunksToLoad();
@@ -552,6 +570,7 @@ async function start() {
       logmc(message.toAnsi());
     }
     switch (text) {
+      logmc(`§6[§bTPM§6] §cINFO: ${text}`);
       case 'Putting coins in escrow...':
         logmc(`§6[§bTPM§6] §3Auction bought in ${Date.now() - firstGui}ms`);
         bot.state = null;
