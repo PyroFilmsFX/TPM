@@ -570,7 +570,6 @@ async function start() {
       logmc(message.toAnsi());
     }
     switch (text) {
-      logmc(`§6[§bTPM§6] §cINFO: ${text}`);
       case 'Putting coins in escrow...':
         logmc(`§6[§bTPM§6] §3Auction bought in ${Date.now() - firstGui}ms`);
         bot.state = null;
@@ -580,23 +579,28 @@ async function start() {
       case "This auction wasn't found!":
       case "The auctioneer has closed this auction!":
       case "You don't have enough coins to afford this bid!":
+        logmc(`§6[§bTPM§6] §cINFO: ${text}`);
         bot.state = null;
         if (bot.currentWindow && !closedGui) bot.closeWindow(bot.currentWindow);
         closedGui = true;
         break;
       case '/limbo for more information.':
+        logmc(`§6[§bTPM§6] §cINFO: ${text}`);
         await sleep(5000);
         bot.state = 'moving';
         bot.chat('/lobby');
         break;
       case 'You may only use this command after 4s on the server!':
       case "You didn't participate in this auction!":
+        logmc(`§6[§bTPM§6] §cINFO: ${text}`);
         bot.state = null;
         break;
       case "Claiming this auction is on cooldown!":
+        logmc(`§6[§bTPM§6] §cINFO: ${text}`);
         cdClaim++;
         break;
       case "There isn't enough space in your inventory!":
+        logmc(`§6[§bTPM§6] §cINFO: ${text}`);
         fullInv = true;
         break;
     }
